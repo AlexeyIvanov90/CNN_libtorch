@@ -1,5 +1,6 @@
 #include "model.h"
 #include  "data_set.h"
+#include <chrono>
 
 
 void classification(std::string path, ConvNet model)
@@ -45,12 +46,17 @@ void train(std::string file_names_csv, ConvNet model, int epochs, torch::Device 
 	model->train();
 	
 	for (int epoch = 1; epoch <= epochs; epoch++) {
+		auto begin = std::chrono::steady_clock::now();
 
 		size_t batch_idx = 0;
 		float mse = 0.; // mean squared error
 		int count = 0;
 
 		for (auto& batch : *data_loader) {
+			std::string consol_text = "\r[" + std::to_string(batch_idx * batch.data.size(0)) + "/" +
+			std::to_string(dataset_size) + "]";
+			std::cout << consol_text;
+
 			auto imgs = batch.data;
 			auto labels = batch.target.squeeze();
 
@@ -68,22 +74,19 @@ void train(std::string file_names_csv, ConvNet model, int epochs, torch::Device 
 			mse += loss.template item<float>();
 
 			batch_idx++;
-			if (batch_idx % log_interval == 0)
-			{
-				std::printf(
-					"\rTrain Epoch: %d/%ld [%5ld/%5d] Loss: %.4f",
-					epoch,
-					epochs,
-					batch_idx * batch.data.size(0),
-					dataset_size,
-					loss.template item<float>());
-			}
-
 			count++;
 		}
 
 		mse /= (float)count;
-		printf(" Mean squared error: %f\n", mse);
+
+		auto end = std::chrono::steady_clock::now();
+		auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+		std::cout << "\rTime for epoch: " << elapsed_ms.count() << " ms\n";
+
+		std::string consol_text = "\rEpoch [" + std::to_string(epoch) + "/" +
+			std::to_string(epochs) + "] Mean squared error: " + std::to_string(mse) + "\n";
+		std::cout << consol_text;
+
 
 		if (mse < best_mse)
 		{

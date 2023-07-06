@@ -39,7 +39,7 @@ int main()
 	auto val_data_loader = torch::data::make_data_loader<torch::data::samplers::RandomSampler>(
 		val_data_set, OptionsData);
 
-	   	 
+   	 
 	train(train_file_csv, model, epochs, device);
 
 	classification(path_img_1, model);
