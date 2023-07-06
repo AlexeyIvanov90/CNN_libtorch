@@ -129,12 +129,12 @@ void train(std::string train_file_csv, std::string val_file_csv, ConvNet model, 
 		std::cout << consol_text;
 
 
-		if (train_mse < best_mse)
+		if (val_mse < best_mse)
 		{
 			model->to(torch::kCPU);
 			model->eval();
 			torch::save(model, "../best_model.pt");
-			best_mse = train_mse;
+			best_mse = val_mse;
 			std::cout << "model save" << std::endl;
 			if (epoch != epochs) {
 				model->to(device);

@@ -14,7 +14,7 @@ int main()
 
 	std::string path_NN = "../best_model.pt";
 
-	auto epochs = 1;
+	auto epochs = 100;
 	auto device = torch::kCPU;
 
 	if (torch::cuda::is_available()) {
