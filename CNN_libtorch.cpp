@@ -31,6 +31,8 @@ int main()
 	auto val_data_set = CustomDataset(val_file_csv).map(torch::data::transforms::Stack<>());
 	auto test_data_set = CustomDataset(test_file_csv).map(torch::data::transforms::Stack<>());
 
+	CustomDataset test(train_file_csv);
+
 	torch::data::DataLoaderOptions OptionsData;
 	OptionsData.batch_size(100).workers(4);
 
@@ -40,7 +42,7 @@ int main()
 		val_data_set, OptionsData);
 
    	 
-	train(train_file_csv, model, epochs, device);
+	train(train_file_csv, val_file_csv, model, epochs, device);
 
 	classification(path_img_1, model);
 

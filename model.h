@@ -48,4 +48,4 @@ struct ConvNetImpl : public torch::nn::Module
 TORCH_MODULE(ConvNet);
 
 void classification(std::string path, ConvNet model);
-void train(std::string file_names_csv, ConvNet model, int epochs, torch::Device device = torch::kCPU);
+void train(std::string train_file_csv, std::string val_file_csv, ConvNet model, int epochs, torch::Device device = torch::kCPU);
