@@ -14,7 +14,7 @@ int main()
 
 	std::string path_NN = "../best_model.pt";
 
-	auto epochs = 10;
+	auto epochs = 1;
 	auto device = torch::kCPU;
 
 	if (torch::cuda::is_available()) {
@@ -26,25 +26,12 @@ int main()
 
 	ConvNet model(3,100,200);
 	torch::load(model, path_NN);
-
-	auto train_data_set = CustomDataset(train_file_csv).map(torch::data::transforms::Stack<>());
-	auto val_data_set = CustomDataset(val_file_csv).map(torch::data::transforms::Stack<>());
-	auto test_data_set = CustomDataset(test_file_csv).map(torch::data::transforms::Stack<>());
-
-	CustomDataset test(train_file_csv);
-
-	torch::data::DataLoaderOptions OptionsData;
-	OptionsData.batch_size(100).workers(4);
-
-	auto train_data_loader = torch::data::make_data_loader<torch::data::samplers::RandomSampler>(
-		train_data_set, OptionsData);
-	auto val_data_loader = torch::data::make_data_loader<torch::data::samplers::RandomSampler>(
-		val_data_set, OptionsData);
-
    	 
 	train(train_file_csv, val_file_csv, model, epochs, device);
-
-	classification(path_img_1, model);
+	
+	std::cout << "Test error: " << classification_accuracy(test_file_csv, model) << std::endl;
+	std::cout << "Val error: " << classification_accuracy(val_file_csv, model) << std::endl;
+	std::cout << "Train error: " << classification_accuracy(train_file_csv, model) << std::endl;
 
 	return 0;
 }

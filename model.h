@@ -47,5 +47,6 @@ struct ConvNetImpl : public torch::nn::Module
 
 TORCH_MODULE(ConvNet);
 
-void classification(std::string path, ConvNet model);
+torch::Tensor classification(torch::Tensor img_tensor, ConvNet model);
+double classification_accuracy(std::string file_csv, ConvNet model);
 void train(std::string train_file_csv, std::string val_file_csv, ConvNet model, int epochs, torch::Device device = torch::kCPU);

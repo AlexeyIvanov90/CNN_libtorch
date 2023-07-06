@@ -3,18 +3,30 @@
 #include <chrono>
 
 
-void classification(std::string path, ConvNet model)
+torch::Tensor classification(torch::Tensor img_tensor, ConvNet model)
 {
-	cv::Mat img = cv::imread(path);
-
-	torch::Tensor img_tensor = img_to_tensor(img);
-
 	torch::Tensor log_prob = model(img_tensor);
 	torch::Tensor prob = torch::exp(log_prob);
 
-	printf("Probability of being\n\
-    1 category = %.2f percent\n\
-    2 category  = %.2f percent\n", prob[0][0].item<float>()*100., prob[0][1].item<float>()*100.);
+	return torch::argmax(prob);
+}
+
+
+double classification_accuracy(std::string file_csv, ConvNet model)
+{
+	int error = 0;
+
+	auto data_set = CustomDataset(file_csv);
+
+	for (int i = 0; i < data_set.size().value(); i++) {
+		auto obj = data_set.get(i);
+		torch::Tensor result = classification(obj.data, model);
+
+		if (result.item<int>() != obj.target.item<int>())
+			error++;
+	}
+
+	return (double)error / data_set.size().value();
 }
 
 
@@ -131,4 +143,3 @@ void train(std::string train_file_csv, std::string val_file_csv, ConvNet model, 
 		}
 	}
 }
-
