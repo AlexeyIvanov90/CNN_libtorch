@@ -25,9 +25,11 @@ int main()
 	device = torch::kCPU;
 
 	ConvNet model(3,100,200);
-	torch::load(model, path_NN);
-   	 
+	
 	train(train_file_csv, val_file_csv, model, epochs, device);
+
+	torch::load(model, path_NN);
+	std::cout << "Model load" << std::endl;
 	
 	std::cout << "Test error: " << classification_accuracy(test_file_csv, model) << std::endl;
 	std::cout << "Val error: " << classification_accuracy(val_file_csv, model) << std::endl;
