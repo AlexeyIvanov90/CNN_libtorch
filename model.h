@@ -3,6 +3,7 @@
 #include <torch/torch.h>
 #include <opencv2/opencv.hpp>
 
+
 struct ConvNetImpl : public torch::nn::Module 
 {
     ConvNetImpl(int64_t channels, int64_t height, int64_t width) 

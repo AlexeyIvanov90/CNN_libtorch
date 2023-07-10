@@ -79,9 +79,9 @@ void train(std::string train_file_csv, std::string val_file_csv, ConvNet model, 
 
 
 		for (auto& batch : *train_data_loader) {
-			std::string consol_text = "\r[" + std::to_string(batch_idx * batch.data.size(0)) + "/" +
+			std::string stat = "\r[" + std::to_string(batch_idx * batch.data.size(0)) + "/" +
 			std::to_string(dataset_size) + "]";
-			std::cout << consol_text;
+			std::cout << stat;
 
 			auto imgs = batch.data;
 			auto labels = batch.target.squeeze();
@@ -128,16 +128,26 @@ void train(std::string train_file_csv, std::string val_file_csv, ConvNet model, 
 		auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 		std::cout << "\rTime for epoch: " << elapsed_ms.count() << " ms\n";
 
-		std::string consol_text = "\rEpoch [" + std::to_string(epoch) + "/" +
+		std::string stat = "\rEpoch [" + std::to_string(epoch) + "/" +
 			std::to_string(epochs) + "] Train error: " + std::to_string(train_mse) + 
-			" Val error: " + std::to_string(val_mse) + "\n";
-		std::cout << consol_text;
+			" Val error: " + std::to_string(val_mse);
+
+		std::ofstream out;
+		out.open("../models/stat.txt", std::ios::app);
+		if (out.is_open())
+			out << stat;
+		out.close();
+
+		std::cout << stat << std::endl;
+
+		model->to(torch::kCPU);
+		model->eval();
+		std::string model_file_name = "../models/epoch_" + std::to_string(epoch) + ".pt";
+		torch::save(model, model_file_name);
 
 
 		if (val_mse < best_mse)
 		{
-			model->to(torch::kCPU);
-			model->eval();
 			torch::save(model, "../best_model.pt");
 			best_mse = val_mse;
 			std::cout << "model save" << std::endl;

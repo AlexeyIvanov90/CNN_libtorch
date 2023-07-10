@@ -15,6 +15,7 @@ torch::Tensor img_to_tensor(std::string path) {
 	return img_to_tensor(img);
 }
 
+
 std::vector<Element> read_csv(std::string& location) {
 	std::fstream in(location, std::ios::in);
 	std::string line;
@@ -34,9 +35,11 @@ std::vector<Element> read_csv(std::string& location) {
 	return csv;
 }
 
+
 CustomDataset::CustomDataset(std::string& file_names_csv) {
 	_csv = read_csv(file_names_csv);
 }
+
 
 torch::data::Example<> CustomDataset::get(size_t index) {
 
@@ -50,6 +53,7 @@ torch::data::Example<> CustomDataset::get(size_t index) {
 
 	return { img_tensor, label_tensor };
 }
+
 
 torch::optional<size_t> CustomDataset::size() const{
 	return _csv.size();
