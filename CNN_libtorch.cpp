@@ -24,7 +24,6 @@ int main()
 	CustomDataset val_data_set(val_file_csv);
 	CustomDataset test_data_set(test_file_csv);
 
-
 	ConvNet model(3, 100, 200);
 
 	torch::data::DataLoaderOptions OptionsData;
