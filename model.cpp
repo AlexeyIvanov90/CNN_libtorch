@@ -35,6 +35,15 @@ double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_erro
 					"_nn_" + std::to_string(result.item<int>()) +
 					".png";
 				cv::imwrite(new_path, img);
+
+				std::ofstream out;
+				out.open("../error/error.csv", std::ios::app);
+				if (out.is_open())
+					out << elem.img + "," +
+					std::to_string(elem.label) + "," +
+					std::to_string(result.item<int>()) +
+					"\n";
+				out.close();
 			}
 		}
 	}
