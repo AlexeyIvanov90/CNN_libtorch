@@ -19,7 +19,8 @@ torch::Tensor classification(torch::Tensor img_tensor, ConvNet model)
 double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_error)
 {
 	int error = 0;
-
+	std::ofstream out;
+	out.open("../error/error.csv", std::ios::out);
 	for (int i = 0; i < scr.size().value(); i++) {
 		auto obj = scr.get(i);
 
@@ -29,24 +30,17 @@ double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_erro
 			error++;
 			if (save_error) {
 				Element elem = scr.get_element(i);
-				auto img = cv::imread(elem.img);
-				std::string new_path = "../error/" + std::to_string(error) +
-					"_lb_" + std::to_string(elem.label) +
-					"_nn_" + std::to_string(result.item<int>()) +
-					".png";
-				cv::imwrite(new_path, img);
 
-				std::ofstream out;
-				out.open("../error/error.csv", std::ios::app);
 				if (out.is_open())
 					out << elem.img + "," +
 					std::to_string(elem.label) + "," +
 					std::to_string(result.item<int>()) +
 					"\n";
-				out.close();
 			}
 		}
 	}
+	out.close();
+
 
 	return (double)error / scr.size().value();
 }

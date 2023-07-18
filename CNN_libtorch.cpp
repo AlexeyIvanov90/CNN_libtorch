@@ -1,5 +1,6 @@
 #include "model.h"
 #include  "data_set.h"
+#include "utils.h"
 
 
 int main()
@@ -7,6 +8,9 @@ int main()
 	std::string train_file_csv = "../data_train.csv";
 	std::string val_file_csv = "../data_val.csv";
 	std::string test_file_csv = "../data_test.csv";
+
+	std::string error_file_csv = "../error/error.csv";
+
 
 	std::string path_NN = "../best_model.pt";
 
@@ -35,8 +39,10 @@ int main()
 	std::cout << "Model load" << std::endl;
 
 	std::cout << "Test error: " << classification_accuracy(test_data_set, model, true) << std::endl;
-	std::cout << "Val error: " << classification_accuracy(val_data_set, model) << std::endl;
-	std::cout << "Train error: " << classification_accuracy(train_data_set, model) << std::endl;
+	//std::cout << "Val error: " << classification_accuracy(val_data_set, model) << std::endl;
+	//std::cout << "Train error: " << classification_accuracy(train_data_set, model) << std::endl;
+
+	examination_error_img(error_file_csv);
 
 	return 0;
 }

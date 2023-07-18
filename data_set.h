@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <tuple>
 #include <sstream>
 #include <fstream>
 #include <torch/torch.h>
