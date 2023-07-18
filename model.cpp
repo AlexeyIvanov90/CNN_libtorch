@@ -20,7 +20,7 @@ double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_erro
 {
 	int error = 0;
 	std::ofstream out;
-	out.open("../NN_error/error.csv", std::ios::out);
+	out.open("../error_CNN/error_CNN.csv", std::ios::out);
 	for (int i = 0; i < scr.size().value(); i++) {
 		auto obj = scr.get(i);
 
