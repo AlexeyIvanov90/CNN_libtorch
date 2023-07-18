@@ -16,7 +16,7 @@ torch::Tensor classification(torch::Tensor img_tensor, ConvNet model)
 }
 
 
-double classification_accuracy(CustomDataset &scr, ConvNet model)
+double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_error)
 {
 	int error = 0;
 
@@ -25,8 +25,18 @@ double classification_accuracy(CustomDataset &scr, ConvNet model)
 
 		torch::Tensor result = classification(obj.data, model);
 
-		if (result.item<int>() != obj.target.item<int>())
+		if (result.item<int>() != obj.target.item<int>()) {
 			error++;
+			if (save_error) {
+				Element elem = scr.get_element(i);
+				auto img = cv::imread(elem.img);
+				std::string new_path = "../error/" + std::to_string(error) +
+					"_lb_" + std::to_string(elem.label) +
+					"_nn_" + std::to_string(result.item<int>()) +
+					".png";
+				cv::imwrite(new_path, img);
+			}
+		}
 	}
 
 	return (double)error / scr.size().value();
@@ -100,7 +110,7 @@ void train(CustomDataset &train_data_set, CustomDataset &val_data_set, ConvNet &
 
 		std::string stat = "\rEpoch [" + std::to_string(epoch) + "/" +
 			std::to_string(epochs) + "] Train MSE: " + std::to_string(train_mse) +
-			" Val error: " + std::to_string(val_accuracy * 100.) + "%";
+			" Val error: " + std::to_string(val_accuracy * 100.) + " %";
 
 		std::string model_file_name = "../models/epoch_" + std::to_string(epoch);
 

@@ -26,6 +26,8 @@ class CustomDataset : public torch::data::Dataset<CustomDataset>
     public:
 		CustomDataset(std::string& file_names_csv);
 		torch::data::Example<> get(size_t index) override;
+		Element get_element(size_t index);
+
 		torch::optional<size_t> size() const override;
 };
 

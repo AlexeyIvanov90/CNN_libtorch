@@ -29,12 +29,12 @@ int main()
 	torch::data::DataLoaderOptions OptionsData;
 	OptionsData.batch_size(64).workers(12);
 
-	train(train_data_set, val_data_set, model, epochs, OptionsData);
+	//train(train_data_set, val_data_set, model, epochs, OptionsData);
 
 	torch::load(model, path_NN);
 	std::cout << "Model load" << std::endl;
 
-	std::cout << "Test error: " << classification_accuracy(test_data_set, model) << std::endl;
+	std::cout << "Test error: " << classification_accuracy(test_data_set, model, true) << std::endl;
 	std::cout << "Val error: " << classification_accuracy(val_data_set, model) << std::endl;
 	std::cout << "Train error: " << classification_accuracy(train_data_set, model) << std::endl;
 

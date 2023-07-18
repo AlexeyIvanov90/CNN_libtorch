@@ -1,6 +1,8 @@
 #include "data_set.h"
 
 torch::Tensor img_to_tensor(cv::Mat scr) {
+	cv::cvtColor(scr, scr, cv::COLOR_BGR2RGB); // camera out - RGB, openCV - BGR
+
 	torch::Tensor img_tensor = torch::from_blob(scr.data, { scr.rows, scr.cols, 3 }, torch::kByte).clone();
 
 	img_tensor = img_tensor.toType(torch::kFloat);
@@ -52,6 +54,11 @@ torch::data::Example<> CustomDataset::get(size_t index) {
 	label_tensor.to(torch::kInt64);
 
 	return { img_tensor, label_tensor };
+}
+
+
+Element CustomDataset::get_element(size_t index) {
+	return _csv[index];
 }
 
 
