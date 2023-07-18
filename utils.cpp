@@ -8,7 +8,7 @@
 #include <conio.h>
 #include <vector>
 
-//make false label csv file
+//make false label error.csv
 //left arrow - TRUE lable, right arrow - FALSE lable
 void examination_error_img(std::string file_csv) {
 	std::fstream in(file_csv, std::ios::in);
@@ -23,7 +23,7 @@ void examination_error_img(std::string file_csv) {
 		data.push_back(line);
 
 	std::ofstream out;
-	out.open("../error/need_delete.csv", std::ios::out);
+	out.open("../NN_error/need_delete.csv", std::ios::out);
 
 	for each (auto str in data)
 	{
@@ -62,11 +62,55 @@ void examination_error_img(std::string file_csv) {
 
 			if (out.is_open())
 				out << path + "\n";
-
-			cv::imwrite("../false.png", img);
 		}
 	}
 
 	out.close();
 }
 
+
+//verification data set (singl class, not lable)
+void examination_data_set(std::string file_csv) {
+	std::fstream in(file_csv, std::ios::in);
+	std::string line;
+
+	std::vector<std::string> data;
+
+	while (getline(in, line))
+		data.push_back(line);
+
+	std::ofstream out;
+	out.open("../ex_data_set/need_delete.csv", std::ios::out);
+
+	for each (auto path in data)
+	{
+		std::cout << path << std::endl;
+
+		auto img = cv::imread(path);
+		cv::resize(img, img, cv::Size({ img.cols * 3, img.rows * 3 }));
+		cv::imshow("<-TRUE IMG FALSE->", img);
+		cv::waitKey(1);
+
+		int key;
+		while (true) {
+			if (_getch() != 224)
+				continue;
+			key = _getch();
+			if (key == 75 || key == 77)
+				break;
+		}
+
+		if (key == 75) {
+			std::cout << "img true" << std::endl;
+		}
+		else {
+			std::cout << "img false" << std::endl;
+			std::cout << "need delete: " << path << std::endl;
+
+			if (out.is_open())
+				out << path + "\n";
+		}
+	}
+
+	out.close();
+}

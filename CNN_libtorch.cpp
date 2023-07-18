@@ -9,8 +9,8 @@ int main()
 	std::string val_file_csv = "../data_val.csv";
 	std::string test_file_csv = "../data_test.csv";
 
-	std::string error_file_csv = "../error/error.csv";
-
+	std::string error_file_csv = "../NN_error/error.csv";
+	std::string single_file_csv = "../singl_test.csv";
 
 	std::string path_NN = "../best_model.pt";
 
@@ -44,5 +44,7 @@ int main()
 
 	examination_error_img(error_file_csv);
 
+	examination_data_set(single_file_csv);
+	
 	return 0;
 }
