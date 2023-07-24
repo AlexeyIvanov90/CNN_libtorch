@@ -8,9 +8,6 @@ int main()
 	std::string train_file_csv = "../data_set/data_train.csv";
 	std::string val_file_csv = "../data_set/data_val.csv";
 	std::string test_file_csv = "../data_set/data_test.csv";
-	std::string test1_file_csv = "../data_test1.csv";
-
-
 	std::string error_file_csv = "../error_CNN/error_CNN.csv";
 	std::string single_file_csv = "../single_data/single_data.csv";
 
@@ -35,7 +32,7 @@ int main()
 	torch::data::DataLoaderOptions OptionsData;
 	OptionsData.batch_size(64).workers(12);
 
-	//train(train_data_set, val_data_set, model, epochs, OptionsData);
+	train(train_data_set, val_data_set, model, epochs, OptionsData);
 
 	torch::load(model, path_NN);
 	std::cout << "Model load" << std::endl;
@@ -46,7 +43,7 @@ int main()
 
 	//verification_error_CNN(error_file_csv);
 	//verification_single_data_set(single_file_csv);
-	verification_data_set(test1_file_csv);
+	//verification_data_set(test1_file_csv);
 
 	return 0;
 }
