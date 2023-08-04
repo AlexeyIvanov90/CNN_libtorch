@@ -13,9 +13,9 @@ struct ConvNetImpl : public torch::nn::Module
 		//conv3(torch::nn::Conv2dOptions(16, 16, 3).stride(1)),
 		//conv4(torch::nn::Conv2dOptions(16, 8, 3).stride(1)),
 		n(GetConvOutput(channels, height, width)),
-		lin1(n, 8192),
-		lin2(8192, 4096 /*number of output classes*/),
-		lin3(4096, 2)
+		lin1(n, 4096),
+		lin2(4096, 1024 /*number of output classes*/),
+		lin3(1024, 2)
 	{
 
 		register_module("conv1", conv1);
