@@ -41,6 +41,7 @@ double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_erro
 	}
 	out.close();
 
+	std::cout << error << std::endl;
 
 	return (double)error / scr.size().value();
 }
