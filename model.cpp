@@ -1,5 +1,6 @@
 #include "model.h"
 #include <chrono>
+#include <filesystem>
 
 
 torch::Tensor classification(torch::Tensor img_tensor, ConvNet model)
@@ -14,6 +15,25 @@ torch::Tensor classification(torch::Tensor img_tensor, ConvNet model)
 
 	return torch::argmax(prob);
 }
+
+void classification_data(CustomDataset &scr, ConvNet model) {
+	for (int i = 0; i < scr.size().value(); i++) {
+		auto obj = scr.get(i);
+		torch::Tensor result = classification(obj.data, model);
+
+		Element elem = scr.get_element(i);
+
+		std::filesystem::create_directory("../new_data/" + std::to_string(result.item<int>()));
+
+		cv::Mat img = cv::imread(elem.img);
+		std::string path_img = "../new_data/";
+		path_img += std::to_string(result.item<int>()) + elem.img.substr(elem.img.rfind("/"));
+		std::cout << path_img << std::endl;
+
+		cv::imwrite(path_img, img);
+	}
+}
+
 
 
 double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_error)
@@ -30,6 +50,9 @@ double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_erro
 			error++;
 			if (save_error) {
 				Element elem = scr.get_element(i);
+				cv::Mat img = cv::imread(elem.img);
+				std::string path_img = "../error_CNN/" +  elem.img.substr(elem.img.rfind("/") + 1);
+				cv::imwrite(path_img, img);
 
 				if (out.is_open())
 					out << elem.img + "," +
@@ -37,6 +60,12 @@ double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_erro
 					std::to_string(result.item<int>()) +
 					"\n";
 			}
+		}
+		else {
+			Element elem = scr.get_element(i);
+			cv::Mat img = cv::imread(elem.img);
+			std::string path_img = "../new_data/" + elem.img.substr(elem.img.rfind("/") + 1);
+			cv::imwrite(path_img, img);
 		}
 	}
 	out.close();
