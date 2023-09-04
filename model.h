@@ -21,6 +21,5 @@ TORCH_MODULE(ConvNet);
 
 
 torch::Tensor classification(torch::Tensor img_tensor, ConvNet model);
-void classification_data(CustomDataset &scr, ConvNet model);
 double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_error = false);
 void train(CustomDataset &train_data_set, CustomDataset &val_data_set, ConvNet &model, int epochs, torch::data::DataLoaderOptions OptionsData, torch::Device device = torch::kCPU);

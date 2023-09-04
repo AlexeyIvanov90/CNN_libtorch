@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
+#include <opencv2/opencv.hpp>
+#include <vector>
 
-void verification_error_CNN(std::string file_csv);
-void verification_single_data_set(std::string file_csv);
-void verification_data_set(std::string file_csv);
+std::vector<double> parameter_img(cv::Mat img);
+std::vector<double> parameter_img(std::string path);

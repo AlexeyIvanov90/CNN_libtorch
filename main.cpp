@@ -5,6 +5,8 @@
 
 int main()
 {
+	//parameter_img("../test.png");
+
 	std::string file_csv = "../data_set/data.csv";
 
 	std::string train_file_csv = "../data_set/data_train.csv";
