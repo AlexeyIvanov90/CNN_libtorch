@@ -36,5 +36,3 @@ int64_t ConvNetImpl::GetConvOutput(int64_t channels, int64_t height, int64_t wid
 	x = torch::max_pool2d(conv2(x), 2);
 	return x.numel();
 }
-
-
