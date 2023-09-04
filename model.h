@@ -19,7 +19,6 @@ struct ConvNetImpl : public torch::nn::Module
 
 TORCH_MODULE(ConvNet);
 
-
 torch::Tensor classification(torch::Tensor img_tensor, ConvNet model);
 void classification_data(CustomDataset &scr, ConvNet model);
 double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_error = false);
