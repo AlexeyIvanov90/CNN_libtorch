@@ -3,7 +3,7 @@
 #include <chrono>
 #include <filesystem>
 
-void train(CustomDataset &train_data_set, CustomDataset &val_data_set, ConvNet &model, int epochs, torch::data::DataLoaderOptions OptionsData, torch::Device device)
+void train(Data_loader &train_data_loader, Data_set &val_data_set, ConvNet &model, int epochs, torch::Device device)
 {
 	if (device == torch::kCPU)
 		std::cout << "Training on CPU" << std::endl;
@@ -12,16 +12,9 @@ void train(CustomDataset &train_data_set, CustomDataset &val_data_set, ConvNet &
 
 	model->to(device);
 
-	auto train_data_set_ = train_data_set.map(torch::data::transforms::Stack<>());
-
-	auto train_data_loader = torch::data::make_data_loader<torch::data::samplers::RandomSampler>(
-		train_data_set_,
-		OptionsData);
-
-
 	torch::optim::Adam optimizer(model->parameters(), torch::optim::AdamOptions(1e-3));
 
-	int dataset_size = train_data_set.size().value();
+	//int dataset_size = train_data_set.size().value();
 	float best_mse = std::numeric_limits<float>::max();
 
 	model->train();
@@ -35,18 +28,25 @@ void train(CustomDataset &train_data_set, CustomDataset &val_data_set, ConvNet &
 		double val_accuracy = DBL_MAX;
 
 
-		for (auto& batch : *train_data_loader) {
-			auto stat = "\r" + std::to_string(int((double(batch_idx * OptionsData.batch_size()) / dataset_size) * 100)) + "%";
+		for (; !train_data_loader.epoch_end();) {
+			//auto stat = "\r" + std::to_string(int((double(batch_idx * OptionsData.batch_size()) / dataset_size) * 100)) + "%";
+			std::string consol_text = "\r" + std::to_string((int)(((train_data_loader.num_batch()) / ((float)train_data_loader.size() / train_data_loader.size_batch())) * 100)) + "%";
+
 			std::cout << stat;
 
-			auto imgs = batch.data;
-			auto labels = batch.target.squeeze();
+			Batch data = train_data_loader.get_batch();
 
-			imgs = imgs.to(device);
+			auto img = data.img;
+			auto parameter = data.parameter;
+			auto labels = data.label.squeeze();
+
+
+			img = img.to(device);
+			parameter = parameter.to(device);
 			labels = labels.to(device);
 
 			optimizer.zero_grad();
-			auto output = model(imgs);
+			auto output = model(img);
 
 			auto loss = torch::nll_loss(output, labels);
 

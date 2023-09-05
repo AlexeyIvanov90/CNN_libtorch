@@ -27,18 +27,15 @@ int main()
 
 	device = torch::kCPU;
 
-	CustomDataset train_data_set(train_file_csv);
-	CustomDataset val_data_set(val_file_csv);
-	CustomDataset test_data_set(test_file_csv);
-
-	CustomDataset data_set(file_csv);
+	Data_set train_data_set(train_file_csv);
+	Data_set val_data_set(val_file_csv);
+	Data_set test_data_set(test_file_csv);
 
 	ConvNet model(3, 100, 200);
 
-	torch::data::DataLoaderOptions OptionsData;
-	OptionsData.batch_size(64).workers(12);
+	Data_loader train_data_loader(train_data_set, 64);
 
-	train(train_data_set, val_data_set, model, epochs, OptionsData);
+	train(train_data_loader, val_data_set, model, epochs);
 
 	torch::load(model, path_NN);
 	std::cout << "Model load" << std::endl;

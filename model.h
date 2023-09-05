@@ -3,6 +3,8 @@
 #include <torch/torch.h>
 #include <opencv2/opencv.hpp>
 #include "data_set.h"
+#include "data_loader.h"
+
 
 
 struct ConvNetImpl : public torch::nn::Module 
@@ -21,5 +23,5 @@ TORCH_MODULE(ConvNet);
 
 
 torch::Tensor classification(torch::Tensor img_tensor, ConvNet model);
-double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_error = false);
-void train(CustomDataset &train_data_set, CustomDataset &val_data_set, ConvNet &model, int epochs, torch::data::DataLoaderOptions OptionsData, torch::Device device = torch::kCPU);
+double classification_accuracy(Data_set &scr, ConvNet model, bool save_error = false);
+void train(Data_loader &train_data_set, Data_set &val_data_set, ConvNet &model, int epochs, torch::Device device = torch::kCPU);

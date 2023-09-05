@@ -1,67 +1,73 @@
 #include "data_set.h"
-
-torch::Tensor img_to_tensor(cv::Mat scr) {
-	cv::cvtColor(scr, scr, cv::COLOR_BGR2RGB); // camera out - RGB, openCV - BGR
-
-	torch::Tensor img_tensor = torch::from_blob(scr.data, { scr.rows, scr.cols, 3 }, torch::kByte).clone();
-
-	img_tensor = img_tensor.toType(torch::kFloat);
-	img_tensor = img_tensor.div(255);
-	img_tensor = img_tensor.permute({ 2,0,1 });
-	return img_tensor;
-}
+#include "utils.h"
 
 
-torch::Tensor img_to_tensor(std::string path) {
-	cv::Mat img = cv::imread(path);
-	return img_to_tensor(img);
-}
-
-
-std::vector<Element> read_csv(std::string& location) {
+auto read_csv(const std::string& location) -> std::vector<Element> {
 	std::fstream in(location, std::ios::in);
 	std::string line;
-	std::string name;
-	std::string label;
 	std::vector<Element> csv;
+	std::string label;
 
 	while (getline(in, line))
 	{
+		Element buf;
 		std::stringstream s(line);
-		getline(s, name, ',');
+		getline(s, buf.img, ',');
 		getline(s, label, ',');
 
-		csv.push_back(Element(name, stoi(label)));
-	}
+		buf.label = std::stoi(label);
 
+		csv.push_back(buf);
+	}
 	return csv;
 }
 
 
-CustomDataset::CustomDataset(std::string& file_names_csv) {
-	_csv = read_csv(file_names_csv);
+Data_set::Data_set(std::string paths_csv)
+{
+	_data = read_csv(paths_csv);
 }
 
 
-torch::data::Example<> CustomDataset::get(size_t index) {
-
-	std::string file_location = _csv[index].img;
-	int64_t label = _csv[index].label;
-
-	torch::Tensor img_tensor = img_to_tensor(file_location);
-
-	torch::Tensor label_tensor = torch::full({ 1 }, label);
-	label_tensor.to(torch::kInt64);
-
-	return { img_tensor, label_tensor };
+Element Data_set::get_element(size_t index) {
+	return _data.at(index);
 }
 
 
-Element CustomDataset::get_element(size_t index) {
-	return _csv[index];
+Element_data Data_set::get(size_t index) {
+	auto obj = _data.at(index);
+
+	torch::Tensor img = img_to_tensor(obj.img);
+
+	std::vector<double> buf = parameter_img(obj.img);
+	
+	auto opts = torch::TensorOptions().dtype(torch::kDouble);
+	torch::Tensor parameter = torch::from_blob(buf.data(), { 3 }, opts).to(torch::kDouble);
+
+	torch::Tensor label = torch::full({ 1 }, obj.label);
+
+	label.to(torch::kInt64);
+
+	return Element_data(img, parameter, label);
 }
 
 
-torch::optional<size_t> CustomDataset::size() const{
-	return _csv.size();
-};
+size_t Data_set::size() {
+	return _data.size();
+}
+
+torch::Tensor img_to_tensor(cv::Mat scr) {
+	cv::cvtColor(scr, scr, CV_BGR2RGB);
+	torch::Tensor img_tensor = torch::from_blob(scr.data, { scr.rows, scr.cols, 3 }, torch::kByte).clone();
+	img_tensor = img_tensor.toType(torch::kFloat);
+	img_tensor = img_tensor.div(255);
+	img_tensor = img_tensor.permute({ 2,0,1 });
+	img_tensor = img_tensor.unsqueeze(0);
+	return img_tensor;
+}
+
+
+torch::Tensor img_to_tensor(std::string file_location) {
+	cv::Mat img = cv::imread(file_location);
+	return img_to_tensor(img);
+}

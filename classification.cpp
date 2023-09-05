@@ -14,17 +14,17 @@ torch::Tensor classification(torch::Tensor img_tensor, ConvNet model)
 }
 
 
-double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_error)
+double classification_accuracy(Data_set &scr, ConvNet model, bool save_error)
 {
 	int error = 0;
 	std::ofstream out;
 	out.open("../error_CNN/error_CNN.csv", std::ios::out);
-	for (int i = 0; i < scr.size().value(); i++) {
+	for (int i = 0; i < scr.size(); i++) {
 		auto obj = scr.get(i);
 
-		torch::Tensor result = classification(obj.data, model);
+		torch::Tensor result = classification(obj.img, model);
 
-		if (result.item<int>() != obj.target.item<int>()) {
+		if (result.item<int>() != obj.label.item<int>()) {
 			error++;
 			if (save_error) {
 				Element elem = scr.get_element(i);
@@ -48,5 +48,5 @@ double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_erro
 	}
 	out.close();
 
-	return (double)error / scr.size().value();
+	return (double)error / scr.size();
 }
