@@ -29,10 +29,8 @@ void train(Data_loader &train_data_loader, Data_set &val_data_set, ConvNet &mode
 
 
 		for (; !train_data_loader.epoch_end();) {
-			//auto stat = "\r" + std::to_string(int((double(batch_idx * OptionsData.batch_size()) / dataset_size) * 100)) + "%";
 			std::string consol_text = "\r" + std::to_string((int)(((train_data_loader.num_batch()) / ((float)train_data_loader.size() / train_data_loader.size_batch())) * 100)) + "%";
-
-			std::cout << stat;
+			std::cout << consol_text;
 
 			Batch data = train_data_loader.get_batch();
 
@@ -40,10 +38,11 @@ void train(Data_loader &train_data_loader, Data_set &val_data_set, ConvNet &mode
 			auto parameter = data.parameter;
 			auto labels = data.label.squeeze();
 
-
 			img = img.to(device);
 			parameter = parameter.to(device);
 			labels = labels.to(device);
+
+			std::cout << parameter << std::endl;
 
 			optimizer.zero_grad();
 			auto output = model(img);

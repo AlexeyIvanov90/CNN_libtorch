@@ -39,16 +39,17 @@ Element_data Data_set::get(size_t index) {
 
 	torch::Tensor img = img_to_tensor(obj.img);
 
-	std::vector<double> buf = parameter_img(obj.img);
+	std::vector<float> buf = parameter_img(obj.img);
 	
-	auto opts = torch::TensorOptions().dtype(torch::kDouble);
-	torch::Tensor parameter = torch::from_blob(buf.data(), { 3 }, opts).to(torch::kDouble);
-
+	auto opts = torch::TensorOptions().dtype(torch::kFloat);
+	torch::Tensor parameter = torch::from_blob(buf.data(), { 3 }, opts).to(torch::kFloat).unsqueeze(0);
 	torch::Tensor label = torch::full({ 1 }, obj.label);
 
 	label.to(torch::kInt64);
 
-	return Element_data(img, parameter, label);
+	//std::cout << parameter << std::endl;
+
+	return Element_data(img, parameter.clone(), label);
 }
 
 

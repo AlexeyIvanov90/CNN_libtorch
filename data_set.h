@@ -19,10 +19,10 @@ struct Element
 
 struct Element_data
 {
-	Element_data(torch::Tensor img, torch::Tensor parametr, torch::Tensor label) :img{ img }, parametr{ parametr }, label{ label } {};
+	Element_data(torch::Tensor img, torch::Tensor parameter, torch::Tensor label) :img{ img }, parameter{ parameter }, label{ label } {};
 
 	torch::Tensor img;
-	torch::Tensor parametr;
+	torch::Tensor parameter;
 	torch::Tensor label;
 };
 

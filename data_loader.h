@@ -6,7 +6,7 @@
 
 struct Batch
 {
-	Batch(torch::Tensor img, torch::Tensor parametr, torch::Tensor  label) :img(img), parameter(parameter), label(label) {};
+	Batch(torch::Tensor img, torch::Tensor parameter, torch::Tensor  label) :img(img), parameter(parameter), label(label) {};
 	torch::Tensor img;
 	torch::Tensor parameter;
 	torch::Tensor label;
@@ -17,7 +17,7 @@ class Data_loader
 {
 private:
 	torch::Tensor batch_img;
-	torch::Tensor batch_parametr;
+	torch::Tensor batch_parameter;
 	torch::Tensor batch_label;
 
 	size_t data_size;

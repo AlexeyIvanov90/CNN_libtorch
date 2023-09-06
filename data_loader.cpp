@@ -23,14 +23,14 @@ Batch Data_loader::get_batch() {
 			Element_data x = data.get(random_index.at(count_batch));
 
 			batch_img = x.img;
-			batch_parametr = x.parametr;
+			batch_parameter = x.parameter;
 			batch_label = x.label;
 		}
 		else {
 			Element_data x = data.get(random_index.at(count_batch));
 
 			batch_img = torch::cat({ batch_img, x.img }, 0);
-			batch_parametr = torch::cat({ batch_parametr, x.parametr }, 0);
+			batch_parameter = torch::cat({ batch_parameter, x.parameter }, 0);
 			batch_label = torch::cat({ batch_label, x.label }, 0);
 
 		}
@@ -38,9 +38,13 @@ Batch Data_loader::get_batch() {
 		if (count_batch%batch_size == 0) {
 			break;
 		}
+
+	//std::cout << batch_parameter << std::endl;
+
 	}
 
-	return Batch(batch_img, batch_parametr, batch_label);
+
+	return Batch(batch_img, batch_parameter, batch_label);
 }
 
 

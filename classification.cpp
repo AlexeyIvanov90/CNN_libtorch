@@ -5,7 +5,6 @@ torch::Tensor classification(torch::Tensor img_tensor, ConvNet model)
 	model->eval();
 	model->to(torch::kCPU);
 	img_tensor.to(torch::kCPU);
-	img_tensor = img_tensor.unsqueeze(0);
 
 	torch::Tensor log_prob = model(img_tensor);
 	torch::Tensor prob = torch::exp(log_prob);

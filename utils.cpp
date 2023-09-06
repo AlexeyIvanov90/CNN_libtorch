@@ -1,8 +1,8 @@
 #include "utils.h"
 
-
-std::vector<double> parameter_img(cv::Mat img) {
-	std::vector<double> out;
+//height, width, area
+std::vector<float> parameter_img(cv::Mat img) {
+	std::vector<float> out;
 	cv::Mat mask;
 
 	cv::cvtColor(img, mask, cv::COLOR_BGR2GRAY);
@@ -21,7 +21,7 @@ std::vector<double> parameter_img(cv::Mat img) {
 }
 
 
-std::vector<double> parameter_img(std::string path) {
+std::vector<float> parameter_img(std::string path) {
 	cv::Mat img = cv::imread(path);
 	return parameter_img(img);
 }
