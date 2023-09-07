@@ -42,10 +42,10 @@ void train(Data_loader &train_data_loader, Data_set &val_data_set, ConvNet &mode
 			parameter = parameter.to(device);
 			labels = labels.to(device);
 
-			std::cout << parameter << std::endl;
+			//std::cout << parameter << std::endl;
 
 			optimizer.zero_grad();
-			auto output = model(img);
+			auto output = model(img, parameter);
 
 			auto loss = torch::nll_loss(output, labels);
 

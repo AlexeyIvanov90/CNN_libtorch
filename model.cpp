@@ -5,7 +5,7 @@ ConvNetImpl::ConvNetImpl(int64_t channels, int64_t height, int64_t width)
 	: conv1(torch::nn::Conv2dOptions(3, 8, 5).stride(1)),
 	conv2(torch::nn::Conv2dOptions(8, 16, 3).stride(1)),
 
-	n(GetConvOutput(channels, height, width)),
+	n(GetConvOutput(channels, height, width) + 3),
 	lin1(n, 1024),
 	lin2(1024, 2)
 {
@@ -16,15 +16,25 @@ ConvNetImpl::ConvNetImpl(int64_t channels, int64_t height, int64_t width)
 	register_module("lin2", lin2);
 };
 
-torch::Tensor ConvNetImpl::forward(torch::Tensor x)
+torch::Tensor ConvNetImpl::forward(torch::Tensor x, torch::Tensor parameter)
 {
 	x = torch::relu(torch::max_pool2d(conv1(x), 2));
 	x = torch::relu(torch::max_pool2d(conv2(x), 2));
 
-	x = x.view({ -1, n });
+	x = x.view({ -1, n - 3 });
+
+	std::cout << x.sizes() << std::endl;
+	std::cout << parameter << std::endl;
+
+
+	x = torch::cat({ x, parameter }, 1);
+
+	std::cout << x.sizes() << std::endl;
+
+
 	x = torch::relu(lin1(x));
 
-	x = torch::log_softmax(lin2(x), 1/*dim*/);
+	x = torch::log_softmax(lin2(x), 1);
 
 	return x;
 };

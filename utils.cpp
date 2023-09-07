@@ -17,6 +17,13 @@ std::vector<float> parameter_img(cv::Mat img) {
 	//out.push_back(cv::contourArea(contours[0]));
 	out.push_back((cv::sum(mask / 255) / 20000.0)[0]);
 
+	for (auto prm : out) {
+		if (prm > 0.99) {
+			cv::imshow("H_param", img);
+			cv::waitKey();
+		}
+	}
+
 	return out;
 }
 

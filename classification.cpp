@@ -1,12 +1,14 @@
 #include "model.h"
 
-torch::Tensor classification(torch::Tensor img_tensor, ConvNet model)
+torch::Tensor classification(torch::Tensor img_tensor, torch::Tensor parameter, ConvNet model)
 {
 	model->eval();
 	model->to(torch::kCPU);
 	img_tensor.to(torch::kCPU);
 
-	torch::Tensor log_prob = model(img_tensor);
+
+
+	torch::Tensor log_prob = model(img_tensor, parameter);
 	torch::Tensor prob = torch::exp(log_prob);
 
 	return torch::argmax(prob);
@@ -21,7 +23,7 @@ double classification_accuracy(Data_set &scr, ConvNet model, bool save_error)
 	for (int i = 0; i < scr.size(); i++) {
 		auto obj = scr.get(i);
 
-		torch::Tensor result = classification(obj.img, model);
+		torch::Tensor result = classification(obj.img, obj.parameter, model);
 
 		if (result.item<int>() != obj.label.item<int>()) {
 			error++;
