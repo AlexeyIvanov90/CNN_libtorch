@@ -3,7 +3,7 @@
 #include <chrono>
 #include <filesystem>
 
-void train(Data_loader &train_data_loader, Data_set &val_data_set, ConvNet &model, int epochs, torch::Device device)
+void train(CustomDataset &train_data_set, CustomDataset &val_data_set, ConvNet &model, int epochs, torch::data::DataLoaderOptions OptionsData, torch::Device device)
 {
 	if (device == torch::kCPU)
 		std::cout << "Training on CPU" << std::endl;
@@ -12,10 +12,14 @@ void train(Data_loader &train_data_loader, Data_set &val_data_set, ConvNet &mode
 
 	model->to(device);
 
+	auto train_data_set_ = train_data_set.map(torch::data::transforms::Stack<>());
+	auto train_data_loader = torch::data::make_data_loader<torch::data::samplers::RandomSampler>(train_data_set_, OptionsData);
+
 	torch::optim::Adam optimizer(model->parameters(), torch::optim::AdamOptions(1e-3));
 
-	//int dataset_size = train_data_set.size().value();
-	float best_mse = std::numeric_limits<float>::max();
+	int dataset_size = train_data_set.size().value();
+	double best_accuracy = classification_accuracy(val_data_set, model);
+	std::cout << "Start accuracy: " << best_accuracy << "%\n";
 
 	model->train();
 
@@ -25,27 +29,20 @@ void train(Data_loader &train_data_loader, Data_set &val_data_set, ConvNet &mode
 		size_t batch_idx = 0;
 		double train_mse = 0.;
 
-		double val_accuracy = DBL_MAX;
+		double val_accuracy;
 
+		for (auto& batch : *train_data_loader) {
+			auto stat = "\r" + std::to_string(int((double(batch_idx * OptionsData.batch_size()) / dataset_size) * 100)) + "%";
+			std::cout << stat;
 
-		for (; !train_data_loader.epoch_end();) {
-			std::string consol_text = "\r" + std::to_string((int)(((train_data_loader.num_batch()) / ((float)train_data_loader.size() / train_data_loader.size_batch())) * 100)) + "%";
-			std::cout << consol_text;
+			auto imgs = batch.data;
+			auto labels = batch.target.squeeze();
 
-			Batch data = train_data_loader.get_batch();
-
-			auto img = data.img;
-			auto parameter = data.parameter;
-			auto labels = data.label.squeeze();
-
-			img = img.to(device);
-			parameter = parameter.to(device);
+			imgs = imgs.to(device);
 			labels = labels.to(device);
 
-			//std::cout << parameter << std::endl;
-
 			optimizer.zero_grad();
-			auto output = model(img, parameter);
+			auto output = model(imgs);
 
 			auto loss = torch::nll_loss(output, labels);
 
@@ -69,16 +66,16 @@ void train(Data_loader &train_data_loader, Data_set &val_data_set, ConvNet &mode
 
 		std::string stat = "\rEpoch [" + std::to_string(epoch) + "/" +
 			std::to_string(epochs) + "] Train MSE: " + std::to_string(train_mse) +
-			" Val error: " + std::to_string(val_accuracy * 100.) + " %";
+			" Val accuracy: " + std::to_string(val_accuracy) + " %";
 
 		std::string model_file_name = "../models/epoch_" + std::to_string(epoch);
 
-		if (val_accuracy < best_mse)
+		if (val_accuracy > best_accuracy)
 		{
 			stat += "\nbest_model";
 			model_file_name += "_best_model";
 			torch::save(model, "../best_model.pt");
-			best_mse = val_accuracy;
+			best_accuracy = val_accuracy;
 		}
 
 		std::ofstream out;

@@ -1,31 +1,30 @@
 #include "model.h"
 
-torch::Tensor classification(torch::Tensor img_tensor, torch::Tensor parameter, ConvNet model)
+torch::Tensor classification(torch::Tensor img_tensor, ConvNet model)
 {
 	model->eval();
 	model->to(torch::kCPU);
 	img_tensor.to(torch::kCPU);
+	img_tensor = img_tensor.unsqueeze(0);
 
-
-
-	torch::Tensor log_prob = model(img_tensor, parameter);
+	torch::Tensor log_prob = model(img_tensor);
 	torch::Tensor prob = torch::exp(log_prob);
 
 	return torch::argmax(prob);
 }
 
 
-double classification_accuracy(Data_set &scr, ConvNet model, bool save_error)
+double classification_accuracy(CustomDataset &scr, ConvNet model, bool save_error)
 {
 	int error = 0;
 	std::ofstream out;
 	out.open("../error_CNN/error_CNN.csv", std::ios::out);
-	for (int i = 0; i < scr.size(); i++) {
+	for (int i = 0; i < scr.size().value(); i++) {
 		auto obj = scr.get(i);
 
-		torch::Tensor result = classification(obj.img, obj.parameter, model);
+		torch::Tensor result = classification(obj.data, model);
 
-		if (result.item<int>() != obj.label.item<int>()) {
+		if (result.item<int>() != obj.target.item<int>()) {
 			error++;
 			if (save_error) {
 				Element elem = scr.get_element(i);
@@ -49,5 +48,5 @@ double classification_accuracy(Data_set &scr, ConvNet model, bool save_error)
 	}
 	out.close();
 
-	return (double)error / scr.size();
+	return ((scr.size().value() - (double)error) / scr.size().value()) * 100;
 }

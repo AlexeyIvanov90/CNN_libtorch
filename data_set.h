@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
-#include <tuple>
-#include <string>
+#include <sstream>
+#include <fstream>
 #include <torch/torch.h>
 #include <opencv2/opencv.hpp>
 
@@ -17,30 +17,20 @@ struct Element
 };
 
 
-struct Element_data
+class CustomDataset : public torch::data::Dataset<CustomDataset>
 {
-	Element_data(torch::Tensor img, torch::Tensor parameter, torch::Tensor label) :img{ img }, parameter{ parameter }, label{ label } {};
+    private:
+		std::vector<Element> _csv;
 
-	torch::Tensor img;
-	torch::Tensor parameter;
-	torch::Tensor label;
+    public:
+		CustomDataset(std::string& file_names_csv);
+		torch::data::Example<> get(size_t index) override;
+		Element get_element(size_t index);
+
+		torch::optional<size_t> size() const override;
 };
 
 
-class Data_set
-{
-private:
-	std::vector<Element> _data;
-	bool data_in_ram = false;
-
-public:
-	Data_set(std::string paths_csv);
-	Element_data get(size_t index);
-
-	Element get_element(size_t index);
-	size_t size();
-};
-
-
+std::vector<Element> read_csv(std::string& location);
 torch::Tensor img_to_tensor(cv::Mat scr);
-torch::Tensor img_to_tensor(std::string file_location);
+torch::Tensor img_to_tensor(std::string path);
